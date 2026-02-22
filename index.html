@@ -1192,13 +1192,16 @@ async function importData(e){
       if(!data.content||!data.logs)throw 0;
       setSyncStatus("syncing");toast("Importing "+data.content.length+" items...","⏳");
 
+      // Build set of contentIds that have a completed log (= finished)
+      const completedIds=new Set(data.logs.filter(l=>l.completed).map(l=>l.contentId||l.content_id));
+
       // Bulk insert content
       const contentRows=data.content.map(c=>({
         user_id:currentUser.id,
         name:c.name,
         type:c.type||"movie",
         poster:c.poster||"",
-        status:c.status||(c._finished?"finished":"ongoing"),
+        status:c.status||(completedIds.has(c.id)?"finished":"ongoing"),
         notes:c.notes||""
       }));
 
