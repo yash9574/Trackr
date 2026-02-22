@@ -1190,18 +1190,43 @@ async function importData(e){
     try{
       const data=JSON.parse(r.result);
       if(!data.content||!data.logs)throw 0;
-      setSyncStatus("syncing");toast("Importing...","⏳");
-      for(const c of data.content){
-        const{data:ins}=await sb.from("content").insert({user_id:currentUser.id,name:c.name,type:c.type,poster:c.poster||"",status:c.status||"ongoing",notes:c.notes||""}).select().single();
-        if(ins){
-          const clogs=data.logs.filter(l=>l.contentId===c.id||l.content_id===c.id);
-          for(const l of clogs){
-            await sb.from("logs").insert({user_id:currentUser.id,content_id:ins.id,season:l.season||1,episode:l.episode,completed:l.completed||false,timestamp:l.timestamp});
-          }
-        }
-      }
-      setSyncStatus("synced");toast("Import successful","✓");loadAll();
-    }catch{setSyncStatus("error");toast("Invalid backup file","⚠️");}
+      setSyncStatus("syncing");toast("Importing "+data.content.length+" items...","⏳");
+
+      // Bulk insert content
+      const contentRows=data.content.map(c=>({
+        user_id:currentUser.id,
+        name:c.name,
+        type:c.type||"movie",
+        poster:c.poster||"",
+        status:c.status||(c._finished?"finished":"ongoing"),
+        notes:c.notes||""
+      }));
+
+      const{data:inserted,error:ce}=await sb.from("content").insert(contentRows).select("id,name");
+      if(ce)throw ce;
+
+      // Map old IDs to new IDs by name
+      const nameToNewId={};
+      inserted.forEach(row=>nameToNewId[row.name]=row.id);
+      const oldIdToNewId={};
+      data.content.forEach(c=>{if(nameToNewId[c.name])oldIdToNewId[c.id]=nameToNewId[c.name];});
+
+      // Bulk insert logs
+      const logRows=data.logs
+        .filter(l=>{const oid=l.contentId||l.content_id;return oldIdToNewId[oid];})
+        .map(l=>{const oid=l.contentId||l.content_id;return{
+          user_id:currentUser.id,
+          content_id:oldIdToNewId[oid],
+          season:l.season||1,
+          episode:l.episode||1,
+          completed:l.completed||false,
+          timestamp:l.timestamp||new Date().toISOString()
+        };});
+
+      if(logRows.length){await sb.from("logs").insert(logRows);}
+
+      setSyncStatus("synced");toast("Imported "+inserted.length+" items!","✓");loadAll();
+    }catch(err){console.error(err);setSyncStatus("error");toast("Import failed","⚠️");}
     e.target.value="";
   };r.readAsText(file);
 }
