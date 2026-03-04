@@ -609,6 +609,12 @@ button:active{transform:scale(0.98);}
     </div>
     <div class="d-label">Watch History</div>
     <div id="historyList"></div>
+    <div style="padding:24px 0 8px;">
+      <button id="deleteEntryBtn" style="background:rgba(255,82,82,0.12);color:#ff5252;border:1px solid rgba(255,82,82,0.3);font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        Delete Entry
+      </button>
+    </div>
     <div class="detail-bottom-pad"></div>
   </div>
 </div>
@@ -942,7 +948,7 @@ document.getElementById("saveProfileBtn").addEventListener("click",async()=>{
   const name=document.getElementById("profileNameInput").value.trim();
   const bio=document.getElementById("profileBioInput").value.trim();
   if(!name)return;
-  await sb.from("profiles").update({display_name:name,bio:bio}).eq("id",currentUser.id);
+  await sb.from("profiles").update({display_name:name,bio:bio,banner_url:currentProfile?.banner_url||null,avatar_url:currentProfile?.avatar_url||null}).eq("id",currentUser.id);
   currentProfile.display_name=name;
   currentProfile.bio=bio;
   document.getElementById("profileNameDisplay").textContent=name.toUpperCase();
@@ -998,6 +1004,7 @@ document.getElementById("backFromDetail").addEventListener("click",()=>goHome())
 document.getElementById("backFromStats").addEventListener("click",()=>goHome());
 document.getElementById("saveContentBtn").addEventListener("click",addContent);
 document.getElementById("saveProgressBtn").addEventListener("click",addProgress);
+document.getElementById("deleteEntryBtn").addEventListener("click",()=>{if(current)deleteContent(current.id,true);});
 document.getElementById("saveNotesBtn").addEventListener("click",saveNotes);
 document.getElementById("editToggleBtn").addEventListener("click",toggleEditPanel);
 document.getElementById("editCancelBtn").addEventListener("click",toggleEditPanel);
@@ -1074,9 +1081,12 @@ function renderGrid(){
     const tagCls='nf-tag-'+c.type;
     card.innerHTML=posterHtml
       +'<div class="nf-card-tag '+tagCls+'">'+c.type+'</div>'
-      +'<div class="nf-card-bottom"><div class="nf-card-name">'+esc(c.name)+'</div>'+(c._lastEp?'<div class="nf-card-lastseen">'+esc(c._lastEp)+'</div>':'')+'</div>';
+      +'<div class="nf-card-bottom"><div class="nf-card-name">'+esc(c.name)+'</div>'+(c._lastEp?'<div class="nf-card-lastseen">'+esc(c._lastEp)+'</div>':'')+'</div>'
+      +'<div class="nf-card-dots" title="Options">⋯</div>';
     addRipple(card);
     card.addEventListener("click",()=>openDetail(c));
+    const dots=card.querySelector(".nf-card-dots");
+    dots.addEventListener("click",e=>{e.stopPropagation();cardMenu(e,c);});
     grid.appendChild(card);
   });
 }
@@ -1136,12 +1146,13 @@ function cardMenu(ev,c){
 }
 
 /* DELETE CONTENT */
-async function deleteContent(id){
+async function deleteContent(id,goBackHome=false){
   closeAll();if(!confirm("Remove from your list?"))return;
   setSyncStatus("syncing");
   await sb.from("logs").delete().eq("content_id",id);
   await sb.from("content").delete().eq("id",id);
-  delete _cache[id];setSyncStatus("synced");toast("Removed","🗑");renderGrid();
+  delete _cache[id];setSyncStatus("synced");toast("Removed","🗑");
+  if(goBackHome)goHome();else renderGrid();
 }
 
 /* OPEN DETAIL */
