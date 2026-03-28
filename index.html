@@ -1188,7 +1188,7 @@ function renderGrid(){
   items.forEach((c)=>{
     const card=document.createElement("div");
     card.className="nf-card ripple-host"+(c.status==="wishlist"?" nf-card-wishlist":"");
-    const posterHtml=c.poster?'<img src="'+esc(c.poster)+'" loading="lazy" alt="'+esc(c.name)+'">':'<div class="nf-card-ph"><div class="nf-card-ph-icon">🎬</div><div class="nf-card-ph-name">'+esc(c.name)+'</div></div>';
+    const posterHtml=c.poster?'<img src="'+esc(c.poster)+'" loading="lazy" alt="'+esc(c.name)+'">':'<div class="nf-card-ph"><div class="nf-card-ph-icon">'+getInitials(c.name)+'</div><div class="nf-card-ph-name">'+esc(c.name)+'</div></div>';
     const tagCls='nf-tag-'+c.type;
     const wishlistRibbon=c.status==="wishlist"?'<div class="nf-card-wishlist-ribbon">&#9829;</div>':'';
     card.innerHTML=posterHtml
@@ -1526,6 +1526,7 @@ function showStats(){navigateTo("statsPage");renderStats();}
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function fmtDate(ts){if(!ts)return"";const d=new Date(ts);return d.toLocaleDateString()+" "+d.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});}
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+function getInitials(name){const words=String(name).split(/\s+/).filter(w=>w.length>0);return words.map(w=>w.charAt(0).toUpperCase()).join("").slice(0,4);}
 
 /* SERVICE WORKER */
 if('serviceWorker' in navigator){
