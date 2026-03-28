@@ -153,8 +153,33 @@ body{background:var(--black);color:var(--text);font-family:var(--font);font-size
 .sidebar-wishlist.active .sidebar-item-label{color:var(--s-wishlist);}
 .sidebar-wishlist.active .sidebar-badge{background:rgba(240,192,64,0.15);color:var(--s-wishlist);}
 
-/* GRID */
-.nf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px 12px;flex:1;min-width:0;}
+/* GRID LAYOUT TOGGLE */
+.grid-layout-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:var(--text);cursor:pointer;flex-shrink:0;transition:all .2s cubic-bezier(0.25,0.46,0.45,0.94);}
+.grid-layout-btn:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.25);}
+.grid-layout-btn:active{transform:scale(0.95);}
+
+/* GRID base — always 3 col, uses minmax so sidebar doesn't collapse it */
+.nf-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:14px 12px;flex:1;min-width:0;}
+
+/* 2-col override */
+.nf-grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr));}
+
+/* List override */
+.nf-grid.cols-list{grid-template-columns:minmax(0,1fr);gap:8px;}
+.nf-grid.cols-list .nf-card{aspect-ratio:unset!important;flex-direction:row;height:80px;border-radius:12px;overflow:hidden;}
+.nf-grid.cols-list .nf-card img{width:54px;min-width:54px;height:80px;object-fit:cover;flex-shrink:0;border-radius:0;}
+.nf-grid.cols-list .nf-card-ph{width:54px;min-width:54px;height:80px;flex-shrink:0;border-radius:0;padding:6px;}
+.nf-grid.cols-list .nf-card-ph-icon{font-size:18px;}
+.nf-grid.cols-list .nf-card-ph-name{font-size:8px;}
+.nf-grid.cols-list .nf-card-bottom{position:static;background:none;padding:0 8px 0 10px;display:flex;flex-direction:column;justify-content:center;flex:1;min-width:0;gap:3px;}
+.nf-grid.cols-list .nf-card-name{font-size:13px;font-weight:700;-webkit-line-clamp:1;text-shadow:none;color:var(--white);}
+.nf-grid.cols-list .nf-card-lastseen{font-size:11px;color:var(--text-secondary);}
+.nf-grid.cols-list .nf-card-tag{top:6px;left:62px;font-size:7px;padding:2px 5px;}
+.nf-grid.cols-list .nf-card-wishlist-ribbon{top:6px;right:34px;width:18px;height:18px;font-size:9px;}
+.nf-grid.cols-list .nf-card-dots{bottom:unset;top:50%;transform:translateY(-50%);right:8px;opacity:1;width:22px;height:22px;font-size:12px;}
+.nf-grid.cols-list .nf-card::after{display:none;}
+.nf-grid.cols-list .nf-card:hover{transform:translateX(2px) translateY(0);}
+
 .nf-empty{grid-column:1/-1;text-align:center;padding:80px 32px;color:var(--text-secondary);}
 .nf-empty-icon{font-size:56px;opacity:0.3;margin-bottom:20px;animation:float 3s ease-in-out infinite;}
 @keyframes float{0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);}}
@@ -230,12 +255,15 @@ button:active{transform:scale(0.98);}
 .login-err.show{display:block;animation:shake .4s;}
 @keyframes shake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 75%{transform:translateX(5px);}}
 .login-field-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-secondary);margin-bottom:8px;display:block;}
-.sync-indicator{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-secondary);padding:4px 8px;background:rgba(255,255,255,0.04);border-radius:12px;border:1px solid rgba(255,255,255,0.08);transition:all .3s;}
-.sync-indicator:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.12);}
-.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--s-ongoing);flex-shrink:0;box-shadow:0 0 8px currentColor;}
-.sync-dot.syncing{background:var(--s-morecoming);animation:pulse 1s infinite;}
-.sync-dot.error{background:#ff5252;box-shadow:0 0 8px #ff5252;}
+.sync-indicator{position:relative;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);cursor:default;transition:all .2s;flex-shrink:0;}
+.sync-indicator:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.18);}
+.sync-dot{width:9px;height:9px;border-radius:50%;background:var(--s-ongoing);box-shadow:0 0 6px var(--s-ongoing);}
+.sync-dot.syncing{background:var(--s-morecoming);box-shadow:0 0 6px var(--s-morecoming);animation:pulse 1s infinite;}
+.sync-dot.error{background:#ff5252;box-shadow:0 0 6px #ff5252;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+/* tooltip shown on hover */
+.sync-tooltip{position:absolute;top:calc(100% + 8px);right:0;background:#1c1c1c;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:7px 12px;font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;pointer-events:none;opacity:0;transform:translateY(-4px);transition:all .2s;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,0.8);}
+.sync-indicator:hover .sync-tooltip{opacity:1;transform:translateY(0);}
 
 /* ADD PAGE */
 .add-body{max-width:540px;margin:0 auto;padding:28px 16px 100px;display:flex;flex-direction:column;gap:32px;}
@@ -439,15 +467,19 @@ button:active{transform:scale(0.98);}
   <header class="nf-header">
     <div class="nf-logo">TRACKR</div>
     <div class="nf-header-right">
-      <div class="sync-indicator" id="syncIndicator" style="display:none">
+      <div class="sync-indicator" id="syncIndicator" style="display:none" title="">
         <div class="sync-dot" id="syncDot"></div>
-        <span id="syncLabel">Synced</span>
+        <div class="sync-tooltip" id="syncTooltip">Synced</div>
       </div>
       <div class="more-wrap">
         <div class="nf-icon-btn" id="moreBtn" title="More">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
         </div>
         <div class="more-drop" id="moreDrop">
+          <div class="more-item" id="miResync">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Resync
+          </div>
           <div class="more-item" id="miExport">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             Export JSON
@@ -474,6 +506,9 @@ button:active{transform:scale(0.98);}
       <div class="nf-search-wrap">
         <svg class="si" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input id="searchInput" placeholder="Search titles..." autocomplete="off">
+      </div>
+      <div class="grid-layout-btn" id="gridLayoutBtn" title="Change layout">
+        <svg id="gridLayoutIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
       </div>
       <div class="sort-wrap">
         <div class="sort-btn" id="sortBtn">
@@ -510,7 +545,7 @@ button:active{transform:scale(0.98);}
         <!-- Ongoing -->
         <div class="sidebar-item active" data-tab="ongoing" id="sidebarOngoing">
           <div class="sidebar-item-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#22c55e" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           </div>
           <span class="sidebar-item-label">Ongoing</span>
           <span class="sidebar-badge" id="cntOngoing">0</span>
@@ -795,7 +830,7 @@ let lastSyncTime=null;
 function setSyncStatus(status){
   const ind=document.getElementById("syncIndicator");
   const dot=document.getElementById("syncDot");
-  const lbl=document.getElementById("syncLabel");
+  const tip=document.getElementById("syncTooltip");
   if(!currentUser){ind.style.display="none";return;}
   ind.style.display="flex";
   dot.className="sync-dot"+(status==="syncing"?" syncing":status==="error"?" error":"");
@@ -803,10 +838,10 @@ function setSyncStatus(status){
   if(status==="synced")lastSyncTime=new Date();
   if(lastSyncTime&&status!=="syncing"){
     const diff=Math.floor((new Date()-lastSyncTime)/1000);
-    let timeStr=diff<60?"just now":diff<3600?Math.floor(diff/60)+"m ago":diff<86400?Math.floor(diff/3600)+"h ago":lastSyncTime.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
-    text+=" • "+timeStr;
+    const timeStr=diff<60?"just now":diff<3600?Math.floor(diff/60)+"m ago":diff<86400?Math.floor(diff/3600)+"h ago":lastSyncTime.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+    text+=" · "+timeStr;
   }
-  lbl.textContent=text;
+  tip.textContent=text;
 }
 
 /* RIPPLE */
@@ -1040,6 +1075,7 @@ document.getElementById("moreBtn").addEventListener("click",e=>{
   closeAll();if(!isOpen)drop.classList.add("open");
 });
 document.getElementById("moreDrop").addEventListener("click",e=>e.stopPropagation());
+document.getElementById("miResync").addEventListener("click",()=>{closeAll();resyncAll();});
 document.getElementById("miExport").addEventListener("click",()=>{closeAll();exportData();});
 document.getElementById("miImport").addEventListener("click",()=>{closeAll();document.getElementById("importFile").click();});
 document.getElementById("miClear").addEventListener("click",()=>{closeAll();confirmClearAll();});
@@ -1086,17 +1122,36 @@ initSwipeBack(document.getElementById("profilePage"),()=>goHome());
 initTabSwipe();
 
 /* SUPABASE DATA */
+/* helper: race a promise against a timeout */
+function withTimeout(promise,ms){
+  return Promise.race([
+    promise,
+    new Promise((_,reject)=>setTimeout(()=>reject(new Error("timeout")),ms))
+  ]);
+}
+let _loadAllInFlight=false;
 async function loadAll(){
   if(!currentUser)return;
+  if(_loadAllInFlight)return;
+  _loadAllInFlight=true;
   setSyncStatus("syncing");
   try{
-    const[{data:items},{data:logs}]=await Promise.all([
-      sb.from("content").select("*").eq("user_id",currentUser.id),
-      sb.from("logs").select("*").eq("user_id",currentUser.id)
-    ]);
+    const results=await withTimeout(
+      Promise.all([
+        sb.from("content").select("*").eq("user_id",currentUser.id),
+        sb.from("logs").select("*").eq("user_id",currentUser.id)
+      ]),
+      30000  /* 30s — generous enough for cold starts and slow connections */
+    );
+    const items=results[0]?.data||[];
+    const logs=results[1]?.data||[];
+    /* only treat it as an error if we got no usable data AND there's an explicit error */
+    const e1=results[0]?.error, e2=results[1]?.error;
+    if(e1&&!items.length)throw e1;
+    if(e2&&!logs.length)throw e2;
     Object.keys(_cache).forEach(k=>delete _cache[k]);
-    (items||[]).forEach(c=>{
-      const cl=(logs||[]).filter(l=>l.content_id===c.id);
+    items.forEach(c=>{
+      const cl=logs.filter(l=>l.content_id===c.id);
       const epl=cl.filter(l=>!l.completed).sort((a,b)=>(b.timestamp||"").localeCompare(a.timestamp||""));
       const times=cl.map(l=>l.timestamp).filter(Boolean).sort();
       const le=epl[0];
@@ -1104,7 +1159,13 @@ async function loadAll(){
       _cache[c.id]={...c,status:c.status||"ongoing",_last:times.length?times[times.length-1]:null,_lastEp:lastEp};
     });
     setSyncStatus("synced");renderGrid();
-  }catch(e){setSyncStatus("error");toast("Sync error","⚠️");}
+  }catch(e){
+    const isTimeout=e?.message==="timeout";
+    setSyncStatus("error");
+    toast(isTimeout?"Sync timed out — tap Resync":"Sync error","⚠️");
+  }finally{
+    _loadAllInFlight=false;
+  }
 }
 
 /* RENDER GRID */
@@ -1471,6 +1532,38 @@ if('serviceWorker' in navigator){
   const swCode=`const CACHE='trackr-v3';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(clients.claim());});self.addEventListener('fetch',e=>{if(e.request.url.includes('supabase'))return;e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request)));});`;
   const blob=new Blob([swCode],{type:'application/javascript'});
   navigator.serviceWorker.register(URL.createObjectURL(blob),{scope:'./'}).catch(()=>{});
+}
+
+/* GRID LAYOUT TOGGLE */
+const GRID_MODES=['cols-3','cols-2','cols-list'];
+const GRID_ICONS={
+  'cols-3':'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  'cols-2':'<rect x="3" y="3" width="8" height="18" rx="1"/><rect x="13" y="3" width="8" height="18" rx="1"/>',
+  'cols-list':'<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>'
+};
+const GRID_LABELS={'cols-3':'3-column','cols-2':'2-column','cols-list':'List'};
+let gridMode='cols-3';
+function applyGridMode(mode){
+  const grid=document.getElementById("grid");
+  /* remove any layout override classes */
+  grid.classList.remove('cols-2','cols-list');
+  /* only add a class for non-default modes */
+  if(mode==='cols-2')grid.classList.add('cols-2');
+  if(mode==='cols-list')grid.classList.add('cols-list');
+  document.getElementById("gridLayoutIcon").innerHTML=GRID_ICONS[mode];
+}
+document.getElementById("gridLayoutBtn").addEventListener("click",()=>{
+  const idx=GRID_MODES.indexOf(gridMode);
+  gridMode=GRID_MODES[(idx+1)%GRID_MODES.length];
+  applyGridMode(gridMode);
+  toast(GRID_LABELS[gridMode],"▦");
+});
+
+/* RESYNC */
+async function resyncAll(){
+  _loadAllInFlight=false;  /* clear any stuck guard so force-fetch always works */
+  toast("Resyncing...","⏳");
+  await loadAll();
 }
 
 /* INIT */
