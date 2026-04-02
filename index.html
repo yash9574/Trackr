@@ -809,7 +809,7 @@ const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 let currentUser=null,currentProfile=null,current=null,activeDrop=null;
 let activeTab="ongoing",activeType="all",activeSort="lastEntry",searchQ="";
 let addPosterData="",currentPage="loginPage";
-let sidebarCollapsed=false;
+let sidebarCollapsed=localStorage.getItem('trackr_sidebarCollapsed')==='true'||true;
 const _cache={};
 const SLABELS={ongoing:"Ongoing",finished:"Finished",morecoming:"More Coming",abandoned:"Abandoned",wishlist:"Wishlist"};
 const SCLS={ongoing:"s-ongoing",finished:"s-finished",morecoming:"s-morecoming",abandoned:"s-abandoned",wishlist:"s-wishlist"};
@@ -858,6 +858,7 @@ document.querySelectorAll(".ripple-host").forEach(addRipple);
 /* SIDEBAR TOGGLE */
 document.getElementById("sidebarToggle").addEventListener("click",()=>{
   sidebarCollapsed=!sidebarCollapsed;
+  localStorage.setItem('trackr_sidebarCollapsed',sidebarCollapsed);
   document.getElementById("nfSidebar").classList.toggle("collapsed",sidebarCollapsed);
 });
 
@@ -1543,7 +1544,7 @@ const GRID_ICONS={
   'cols-list':'<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>'
 };
 const GRID_LABELS={'cols-3':'3-column','cols-2':'2-column','cols-list':'List'};
-let gridMode='cols-3';
+let gridMode=localStorage.getItem('trackr_gridMode')||'cols-3';
 function applyGridMode(mode){
   const grid=document.getElementById("grid");
   /* remove any layout override classes */
@@ -1556,6 +1557,7 @@ function applyGridMode(mode){
 document.getElementById("gridLayoutBtn").addEventListener("click",()=>{
   const idx=GRID_MODES.indexOf(gridMode);
   gridMode=GRID_MODES[(idx+1)%GRID_MODES.length];
+  localStorage.setItem('trackr_gridMode',gridMode);
   applyGridMode(gridMode);
   toast(GRID_LABELS[gridMode],"▦");
 });
@@ -1568,6 +1570,8 @@ async function resyncAll(){
 }
 
 /* INIT */
+applyGridMode(gridMode);
+document.getElementById("nfSidebar").classList.toggle("collapsed",sidebarCollapsed);
 initAuth();
 </script>
 </body>
