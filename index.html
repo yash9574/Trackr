@@ -923,6 +923,7 @@ function initSwipeBack(pageEl,onBack){
 }
 
 /* TAB SWIPE on grid */
+/*
 function initTabSwipe(){
   const tabs=["ongoing","finished","morecoming","abandoned","wishlist"];
   const grid=document.getElementById("grid");
@@ -939,7 +940,7 @@ function initTabSwipe(){
     renderGrid();
   },{passive:true});
 }
-
+*/
 /* CLOSE DROPS */
 function closeAll(){if(activeDrop){activeDrop.remove();activeDrop=null;}document.getElementById("sortDrop")?.classList.remove("open");document.getElementById("sortBtn")?.classList.remove("open");document.getElementById("moreDrop")?.classList.remove("open");}
 document.addEventListener("click",closeAll);
@@ -1120,7 +1121,7 @@ initSwipeBack(document.getElementById("detail"),()=>goHome());
 initSwipeBack(document.getElementById("addPage"),()=>goHome());
 initSwipeBack(document.getElementById("statsPage"),()=>goHome());
 initSwipeBack(document.getElementById("profilePage"),()=>goHome());
-initTabSwipe();
+//initTabSwipe();
 
 /* SUPABASE DATA */
 /* helper: race a promise against a timeout */
